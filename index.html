@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Padel Practice Tracker</title>
+  <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.20.15/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div id="root" class="min-h-screen bg-gray-100"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Mock data: Array of players and practice entries
+    const players = ['Alice', 'Bob', 'Charlie'];
+    const initialData = [
+      { player: 'Francisco Fleming', date: '2025-04-25', rating: 3 },
+      { player: 'Francisco Fleming', date: '2025-04-26', rating: 4 },
+      { player: 'Francisco Fleming', date: '2025-04-27', rating: 2 },
+      { player: 'Gustavo Fleming', date: '2025-04-25', rating: 4 },
+      { player: 'Gustavo Fleming', date: '2025-04-26', rating: 5 },
+      { player: 'João Alves', date: '2025-04-27', rating: 3 },
+      { player: 'João Alves', date: '2025-04-28', rating: 4 },
+    ];
+
+    // Component for submitting new ratings
+    const RatingForm = ({ addRating, selectedPlayer, setSelectedPlayer }) => {
+      const [rating, setRating] = useState(1);
+      const today = new Date().toISOString().split('T')[0];
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!selectedPlayer) {
+          alert('Please select a player.');
+          return;
+        }
+        addRating({ player: selectedPlayer, date: today, rating: parseInt(rating) });
+        setRating(1);
+      };
+
+      return (
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <h2 className="text-xl font-semibold mb-4">Log Today's Practice</h2>
+          <div className="flex items-center space-x-4">
+            <label className="font-medium">Player:</label>
+            <select
+              value={selectedPlayer}
+              onChange={(e) => setSelectedPlayer(e.target.value)}
+              className="border rounded p-2"
+            >
+              <option value="">Select Player</option>
+              {players.map((player) => (
+                <option key={player} value={player}>{player}</option>
+              ))}
+            </select>
+            <label className="font-medium">Rating (1-5):</label>
+            <select
+              value={rating}
+              onChange={(e) => setRating(e.target.value)}
+              className="border rounded p-2"
+            >
+              {[1, 2, 3, 4, 5].map((num) => (
+                <option key={num} value={num}>{num}</option>
+              ))}
+            </select>
+            <button
+              onClick={handleSubmit}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      );
+    };
+
+    // Component for displaying the performance chart
+    const PerformanceChart = ({ data, selectedPlayer }) => {
+      useEffect(() => {
+        if (data.length === 0) return; // Skip if no data
+
+        const canvas = document.getElementById('performanceChart');
+        if (!canvas) return; // Safeguard: Ensure canvas exists
+
+        const ctx = canvas.getContext('2d');
+        const chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.map((entry) => entry.date),
+            datasets: [{
+              label: `Practice Rating (${selectedPlayer || 'No Player'})`,
+              data: data.map((entry) => entry.rating),
+              borderColor: 'rgb(59, 130, 246)',
+              backgroundColor: 'rgba(59, 130, 246, 0.2)',
+              fill: true,
+              tension: 0.4,
+            }],
+          },
+          options: {
+            scales: {
+              y: {
+                min: 1,
+                max: 5,
+                ticks: { stepSize: 1 },
+                title: { display: true, text: 'Rating' },
+              },
+              x: {
+                title: { display: true, text: 'Date' },
+              },
+            },
+          },
+        });
+
+        return () => chart.destroy();
+      }, [data, selectedPlayer]);
+
+      return (
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Performance Over Time</h2>
+          {data.length > 0 ? (
+            <canvas id="performanceChart"></canvas>
+          ) : (
+            <p className="text-gray-500">No data available for {selectedPlayer || 'selected player'}.</p>
+          )}
+        </div>
+      );
+    };
+
+    // Error Boundary Component
+    class ErrorBoundary extends React.Component {
+      state = { hasError: false };
+
+      static getDerivedStateFromError(error) {
+        return { hasError: true };
+      }
+
+      render() {
+        if (this.state.hasError) {
+          return <h1 className="text-red-500 text-center">Something went wrong.</h1>;
+        }
+        return this.props.children;
+      }
+    }
+
+    // Main App component
+    const App = () => {
+      const [ratings, setRatings] = useState(initialData);
+      const [selectedPlayer, setSelectedPlayer] = useState('');
+
+      const addRating = (newRating) => {
+        setRatings([...ratings, newRating].sort((a, b) => new Date(a.date) - new Date(b.date)));
+      };
+
+      // Filter ratings for the selected player
+      const filteredRatings = selectedPlayer
+        ? ratings.filter((rating) => rating.player === selectedPlayer)
+        : [];
+
+      return (
+        <ErrorBoundary>
+          <div className="container mx-auto p-4">
+            <h1 className="text-3xl font-bold text-center mb-8">Padel Practice Tracker</h1>
+            <RatingForm
+              addRating={addRating}
+              selectedPlayer={selectedPlayer}
+              setSelectedPlayer={setSelectedPlayer}
+            />
+            <PerformanceChart data={filteredRatings} selectedPlayer={selectedPlayer} />
+          </div>
+        </ErrorBoundary>
+      );
+    };
+
+    // Render the app using createRoot
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
