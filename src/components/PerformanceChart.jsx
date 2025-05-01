@@ -13,6 +13,57 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
   const defaultMinDate = dates.length > 0 ? Math.min(...dates.map((d) => new Date(d))) : '';
   const defaultMaxDate = dates.length > 0 ? Math.max(...dates.map((d) => new Date(d))) : '';
 
+  // Helper functions for date ranges
+  const getThisWeekRange = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 (Sun) to 6 (Sat)
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Days to subtract to get Monday
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - daysToMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
+    return {
+      min: startOfWeek.toISOString().split('T')[0],
+      max: today.toISOString().split('T')[0],
+    };
+  };
+
+  const getThisMonthRange = () => {
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    return {
+      min: startOfMonth.toISOString().split('T')[0],
+      max: today.toISOString().split('T')[0],
+    };
+  };
+
+  const getThisYearRange = () => {
+    const today = new Date();
+    const startOfYear = new Date(today.getFullYear(), 0, 1);
+    return {
+      min: startOfYear.toISOString().split('T')[0],
+      max: today.toISOString().split('T')[0],
+    };
+  };
+
+  // Button click handlers
+  const handleThisWeek = () => {
+    const { min, max } = getThisWeekRange();
+    setMinDate(min);
+    setMaxDate(max);
+  };
+
+  const handleThisMonth = () => {
+    const { min, max } = getThisMonthRange();
+    setMinDate(min);
+    setMaxDate(max);
+  };
+
+  const handleThisYear = () => {
+    const { min, max } = getThisYearRange();
+    setMinDate(min);
+    setMaxDate(max);
+  };
+
   useEffect(() => {
     if (data.length === 0) return;
 
@@ -75,6 +126,26 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
             className="border rounded p-2 w-full sm:w-auto"
           />
         </div>
+      </div>
+      <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 mb-4">
+        <button
+          onClick={handleThisWeek}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          This Week
+        </button>
+        <button
+          onClick={handleThisMonth}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          This Month
+        </button>
+        <button
+          onClick={handleThisYear}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          This Year
+        </button>
       </div>
       {data.length > 0 ? (
         <>
