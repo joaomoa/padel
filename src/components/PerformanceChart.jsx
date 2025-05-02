@@ -2,11 +2,14 @@ import { useEffect } from 'react';
 import Chart from 'chart.js/auto';
 
 const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, setMaxDate }) => {
-  // Calculate statistics
+  // Calculate score
   const ratings = data.map((entry) => entry.rating);
-  const minRating = ratings.length > 0 ? Math.min(...ratings) : 'N/A';
-  const maxRating = ratings.length > 0 ? Math.max(...ratings) : 'N/A';
-  const avgRating = ratings.length > 0 ? (ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(2) : 'N/A';
+  const score = ratings.length > 0
+    ? (() => {
+        const avg = ratings.reduce((sum, r) => sum + r, 0) / ratings.length;
+        return avg > 4.7 ? 5 : Math.floor(avg);
+      })()
+    : 'N/A';
 
   // Calculate default min and max dates from data
   const dates = data.map((entry) => entry.date);
@@ -151,14 +154,8 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
         <>
           <canvas id="performanceChart"></canvas>
           <div className="mt-4">
-            <p>
-              <strong>Min Rating:</strong> {minRating}
-            </p>
-            <p>
-              <strong>Max Rating:</strong> {maxRating}
-            </p>
-            <p>
-              <strong>Avg Rating:</strong> {avgRating}
+            <p className="text-gray-900 font-medium">
+              <strong>Score:</strong> {score}
             </p>
           </div>
         </>
