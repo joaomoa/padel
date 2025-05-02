@@ -54,7 +54,6 @@ const App = () => {
   }, [isPlayerFromUrl, selectedPlayer]);
 
   const addRating = async (newRating) => {
-    // Check for existing rating for the same player and date
     const ratingsQuery = query(
       collection(db, 'ratings'),
       where('player', '==', newRating.player),
@@ -63,11 +62,9 @@ const App = () => {
     const querySnapshot = await getDocs(ratingsQuery);
 
     if (!querySnapshot.empty) {
-      // Update existing rating
       const existingDoc = querySnapshot.docs[0];
       await setDoc(doc(db, 'ratings', existingDoc.id), newRating);
     } else {
-      // Add new rating
       await setDoc(doc(collection(db, 'ratings')), newRating);
     }
   };
@@ -83,7 +80,6 @@ const App = () => {
     await setDoc(playerDoc, { names: [...currentPlayers, newPlayer] });
   };
 
-  // Filter ratings for the selected player and date range
   const filteredRatings = selectedPlayer
     ? ratings
         .filter((rating) => rating.player === selectedPlayer)
@@ -96,8 +92,8 @@ const App = () => {
 
   return (
     <ErrorBoundary>
-      <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold text-center mb-8">Padel Practice Tracker</h1>
+      <div className="min-h-screen bg-grey p-4">
+        <h1 className="text-3xl font-bold text-orange text-center mb-8">Padel Practice Tracker</h1>
         <RatingForm
           addRating={addRating}
           selectedPlayer={selectedPlayer}
