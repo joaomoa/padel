@@ -14,7 +14,6 @@ const App = () => {
   const [minDate, setMinDate] = useState('');
   const [maxDate, setMaxDate] = useState('');
 
-  // Parse URL for player parameter
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const playerFromUrl = params.get('player');
@@ -24,14 +23,11 @@ const App = () => {
     }
   }, []);
 
-  // Load players and ratings from Firestore in real-time
   useEffect(() => {
-    // Subscribe to players
     const unsubscribePlayers = onSnapshot(doc(db, 'data', 'players'), (doc) => {
       if (doc.exists()) {
         const playerNames = doc.data().names || [];
         setPlayers(playerNames);
-        // Validate player from URL
         if (isPlayerFromUrl && !playerNames.includes(selectedPlayer)) {
           setSelectedPlayer('');
           setIsPlayerFromUrl(false);
@@ -41,7 +37,6 @@ const App = () => {
       }
     });
 
-    // Subscribe to ratings
     const unsubscribeRatings = onSnapshot(collection(db, 'ratings'), (snapshot) => {
       const ratingsData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setRatings(ratingsData.sort((a, b) => new Date(a.date) - new Date(b.date)));
