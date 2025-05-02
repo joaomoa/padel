@@ -4,6 +4,7 @@ const RatingForm = ({ addRating, selectedPlayer, setSelectedPlayer, players, isP
   const [rating, setRating] = useState(1);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [copied, setCopied] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,6 +19,8 @@ const RatingForm = ({ addRating, selectedPlayer, setSelectedPlayer, players, isP
     addRating({ player: selectedPlayer, date, rating: parseInt(rating) });
     setRating(1);
     setDate(new Date().toISOString().split('T')[0]);
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), 2000);
   };
 
   const copyUrl = async () => {
@@ -101,6 +104,11 @@ const RatingForm = ({ addRating, selectedPlayer, setSelectedPlayer, players, isP
           Submit
         </button>
       </div>
+      {success && (
+        <p className="mt-4 text-white bg-green-500 px-4 py-2 rounded text-center">
+          Rating submitted!
+        </p>
+      )}
     </div>
   );
 };
