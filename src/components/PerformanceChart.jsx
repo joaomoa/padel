@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import Chart from 'chart.js/auto';
 
 const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, setMaxDate }) => {
-  // Calculate score
   const ratings = data.map((entry) => entry.rating);
   const score = ratings.length > 0
     ? (() => {
@@ -11,16 +10,14 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
       })()
     : 'N/A';
 
-  // Calculate default min and max dates from data
   const dates = data.map((entry) => entry.date);
   const defaultMinDate = dates.length > 0 ? Math.min(...dates.map((d) => new Date(d))) : '';
   const defaultMaxDate = dates.length > 0 ? Math.max(...dates.map((d) => new Date(d))) : '';
 
-  // Helper functions for date ranges
   const getThisWeekRange = () => {
     const today = new Date();
-    const dayOfWeek = today.getDay(); // 0 (Sun) to 6 (Sat)
-    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Days to subtract to get Monday
+    const dayOfWeek = today.getDay();
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - daysToMonday);
     startOfWeek.setHours(0, 0, 0, 0);
@@ -48,7 +45,6 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
     };
   };
 
-  // Button click handlers
   const handleThisWeek = () => {
     const { min, max } = getThisWeekRange();
     setMinDate(min);
@@ -82,8 +78,8 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
           {
             label: `Practice Rating (${selectedPlayer || 'No Player'})`,
             data: data.map((entry) => entry.rating),
-            borderColor: 'rgb(59, 130, 246)',
-            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            borderColor: '#F28C38', // Orange for chart line
+            backgroundColor: 'rgba(242, 140, 56, 0.2)',
             fill: true,
             tension: 0.4,
           },
@@ -94,11 +90,19 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
           y: {
             min: 1,
             max: 5,
-            ticks: { stepSize: 1 },
-            title: { display: true, text: 'Rating' },
+            ticks: { stepSize: 1, color: '#FFFFFF' },
+            title: { display: true, text: 'Rating', color: '#FFFFFF' },
+            grid: { color: '#D3D3D3' },
           },
           x: {
-            title: { display: true, text: 'Date' },
+            title: { display: true, text: 'Date', color: '#FFFFFF' },
+            ticks: { color: '#FFFFFF' },
+            grid: { color: '#D3D3D3' },
+          },
+        },
+        plugins: {
+          legend: {
+            labels: { color: '#FFFFFF' },
           },
         },
       },
@@ -108,44 +112,44 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
   }, [data, selectedPlayer]);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md mb-12">
-      <h2 className="text-xl font-semibold mb-4">Performance Over Time</h2>
+    <div className="bg-grey p-6 rounded-lg shadow-md mb-12">
+      <h2 className="text-xl font-semibold text-orange mb-4">Performance Over Time</h2>
       <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-4">
         <div className="flex items-center space-x-4">
-          <label className="font-medium">From:</label>
+          <label className="font-medium text-light-grey">From:</label>
           <input
             type="date"
             value={minDate || (defaultMinDate && new Date(defaultMinDate).toISOString().split('T')[0])}
             onChange={(e) => setMinDate(e.target.value)}
-            className="border rounded p-2 w-full sm:w-auto"
+            className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-grey focus:border-orange focus:ring-orange"
           />
         </div>
         <div className="flex items-center space-x-4">
-          <label className="font-medium">To:</label>
+          <label className="font-medium text-light-grey">To:</label>
           <input
             type="date"
             value={maxDate || (defaultMaxDate && new Date(defaultMaxDate).toISOString().split('T')[0])}
             onChange={(e) => setMaxDate(e.target.value)}
-            className="border rounded p-2 w-full sm:w-auto"
+            className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-grey focus:border-orange focus:ring-orange"
           />
         </div>
       </div>
       <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 mb-4">
         <button
           onClick={handleThisWeek}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="bg-orange text-white px-4 py-2 rounded hover:bg-orange/80"
         >
           This Week
         </button>
         <button
           onClick={handleThisMonth}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="bg-orange text-white px-4 py-2 rounded hover:bg-orange/80"
         >
           This Month
         </button>
         <button
           onClick={handleThisYear}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="bg-orange text-white px-4 py-2 rounded hover:bg-orange/80"
         >
           This Year
         </button>
@@ -154,13 +158,13 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
         <>
           <canvas id="performanceChart"></canvas>
           <div className="mt-4">
-            <p className="text-gray-900 font-medium">
+            <p className="text-white font-medium">
               <strong>Score:</strong> {score}
             </p>
           </div>
         </>
       ) : (
-        <p className="text-gray-500">No data available for {selectedPlayer || 'selected player'}.</p>
+        <p className="text-light-grey">No data available for {selectedPlayer || 'selected player'}.</p>
       )}
     </div>
   );
