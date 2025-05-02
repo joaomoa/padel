@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
+import { collection, doc, setDoc, getDoc, onSnapshot, query, where, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
 import RatingForm from './components/RatingForm';
 import PerformanceChart from './components/PerformanceChart';
@@ -54,7 +54,22 @@ const App = () => {
   }, [isPlayerFromUrl, selectedPlayer]);
 
   const addRating = async (newRating) => {
-    await setDoc(doc(collection(db, 'ratings')), newRating);
+    // Check for existing rating for the same player and date
+    const ratingsQuery = query(
+      collection(db, 'ratings'),
+      where('player', '==', newRating.player),
+      where('date', '==', newRating.date)
+    );
+    const querySnapshot = await getDocs(ratingsQuery);
+
+    if (!querySnapshot.empty) {
+      // Update existing rating
+      const existingDoc = querySnapshot.docs[0];
+      await setDoc(doc(db, 'ratings', existingDoc.id), newRating);
+    } else {
+      // Add new rating
+      await setDoc(doc(collection(db, 'ratings')), newRating);
+    }
   };
 
   const addPlayer = async (newPlayer) => {
