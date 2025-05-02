@@ -14,7 +14,7 @@ const AddPlayerForm = ({ addPlayer }) => {
   };
 
   return (
-    <div className="bg-grey p-6 rounded-lg shadow-md mb-6">
+    <div className="bg-container-grey p-6 rounded-lg shadow-md mb-6">
       <h2 className="text-xl font-semibold text-orange mb-4">Add New Player</h2>
       <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
         <input
@@ -22,7 +22,7 @@ const AddPlayerForm = ({ addPlayer }) => {
           value={newPlayer}
           onChange={(e) => setNewPlayer(e.target.value)}
           placeholder="Player name"
-          className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-grey focus:border-orange focus:ring-orange"
+          className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-container-grey focus:border-orange focus:ring-orange"
         />
         <button
           onClick={handleSubmit}
