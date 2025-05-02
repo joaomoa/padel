@@ -10,15 +10,32 @@ const App = () => {
   const [ratings, setRatings] = useState([]);
   const [players, setPlayers] = useState([]);
   const [selectedPlayer, setSelectedPlayer] = useState('');
+  const [isPlayerFromUrl, setIsPlayerFromUrl] = useState(false);
   const [minDate, setMinDate] = useState('');
   const [maxDate, setMaxDate] = useState('');
+
+  // Parse URL for player parameter
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const playerFromUrl = params.get('player');
+    if (playerFromUrl) {
+      setSelectedPlayer(playerFromUrl);
+      setIsPlayerFromUrl(true);
+    }
+  }, []);
 
   // Load players and ratings from Firestore in real-time
   useEffect(() => {
     // Subscribe to players
     const unsubscribePlayers = onSnapshot(doc(db, 'data', 'players'), (doc) => {
       if (doc.exists()) {
-        setPlayers(doc.data().names || []);
+        const playerNames = doc.data().names || [];
+        setPlayers(playerNames);
+        // Validate player from URL
+        if (isPlayerFromUrl && !playerNames.includes(selectedPlayer)) {
+          setSelectedPlayer('');
+          setIsPlayerFromUrl(false);
+        }
       } else {
         setDoc(doc(db, 'data', 'players'), { names: [] });
       }
@@ -34,7 +51,7 @@ const App = () => {
       unsubscribePlayers();
       unsubscribeRatings();
     };
-  }, []);
+  }, [isPlayerFromUrl, selectedPlayer]);
 
   const addRating = async (newRating) => {
     await setDoc(doc(collection(db, 'ratings')), newRating);
@@ -71,6 +88,7 @@ const App = () => {
           selectedPlayer={selectedPlayer}
           setSelectedPlayer={setSelectedPlayer}
           players={players}
+          isPlayerFromUrl={isPlayerFromUrl}
         />
         <PerformanceChart
           data={filteredRatings}
@@ -80,7 +98,7 @@ const App = () => {
           setMinDate={setMinDate}
           setMaxDate={setMaxDate}
         />
-        <AddPlayerForm addPlayer={addPlayer} />
+        {!isPlayerFromUrl && <AddPlayerForm addPlayer={addPlayer} />}
       </div>
     </ErrorBoundary>
   );
