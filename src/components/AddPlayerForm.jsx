@@ -6,7 +6,7 @@ const AddPlayerForm = ({ addPlayer }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!newPlayer.trim()) {
-      alert('Player name cannot be empty.');
+      alert('Please enter a player name.');
       return;
     }
     addPlayer(newPlayer.trim());
@@ -14,19 +14,19 @@ const AddPlayerForm = ({ addPlayer }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-      <h2 className="text-xl font-semibold mb-4">Add New Player</h2>
-      <div className="flex items-center space-x-4">
+    <div className="bg-grey p-6 rounded-lg shadow-md mb-6">
+      <h2 className="text-xl font-semibold text-orange mb-4">Add New Player</h2>
+      <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
         <input
           type="text"
           value={newPlayer}
           onChange={(e) => setNewPlayer(e.target.value)}
-          placeholder="Enter player name"
-          className="border rounded p-2 flex-grow"
+          placeholder="Player name"
+          className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-grey focus:border-orange focus:ring-orange"
         />
         <button
           onClick={handleSubmit}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          className="bg-orange text-white px-4 py-2 rounded hover:bg-orange/80 w-full sm:w-auto"
         >
           Add Player
         </button>
