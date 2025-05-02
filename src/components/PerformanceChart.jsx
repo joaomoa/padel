@@ -78,7 +78,7 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
           {
             label: `Practice Rating (${selectedPlayer || 'No Player'})`,
             data: data.map((entry) => entry.rating),
-            borderColor: '#F28C38', // Orange for chart line
+            borderColor: '#F28C38',
             backgroundColor: 'rgba(242, 140, 56, 0.2)',
             fill: true,
             tension: 0.4,
@@ -112,7 +112,7 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
   }, [data, selectedPlayer]);
 
   return (
-    <div className="bg-grey p-6 rounded-lg shadow-md mb-12">
+    <div className="bg-container-grey p-6 rounded-lg shadow-md mb-12">
       <h2 className="text-xl font-semibold text-orange mb-4">Performance Over Time</h2>
       <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-4">
         <div className="flex items-center space-x-4">
@@ -121,7 +121,7 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
             type="date"
             value={minDate || (defaultMinDate && new Date(defaultMinDate).toISOString().split('T')[0])}
             onChange={(e) => setMinDate(e.target.value)}
-            className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-grey focus:border-orange focus:ring-orange"
+            className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-container-grey focus:border-orange focus:ring-orange"
           />
         </div>
         <div className="flex items-center space-x-4">
@@ -130,7 +130,7 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
             type="date"
             value={maxDate || (defaultMaxDate && new Date(defaultMaxDate).toISOString().split('T')[0])}
             onChange={(e) => setMaxDate(e.target.value)}
-            className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-grey focus:border-orange focus:ring-orange"
+            className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-container-grey focus:border-orange focus:ring-orange"
           />
         </div>
       </div>
