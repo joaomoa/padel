@@ -27,7 +27,7 @@ const RatingForm = ({ addRating, selectedPlayer, setSelectedPlayer, players, isP
       const url = `${baseUrl}?player=${encodeURIComponent(selectedPlayer)}`;
       await navigator.clipboard.writeText(url);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy URL:', err);
       alert('Failed to copy URL. Please try again.');
@@ -35,23 +35,23 @@ const RatingForm = ({ addRating, selectedPlayer, setSelectedPlayer, players, isP
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-      <h2 className="text-xl font-semibold mb-4">Log Practice</h2>
+    <div className="bg-grey p-6 rounded-lg shadow-md mb-6">
+      <h2 className="text-xl font-semibold text-orange mb-4">Log Practice</h2>
       <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
         <div className="flex items-center space-x-4">
-          <label className="font-medium">Player:</label>
+          <label className="font-medium text-light-grey">Player:</label>
           {isPlayerFromUrl ? (
-            <span className="text-gray-900 font-medium">{selectedPlayer}</span>
+            <span className="text-white font-medium">{selectedPlayer}</span>
           ) : (
             <div className="flex items-center space-x-4">
               <select
                 value={selectedPlayer}
                 onChange={(e) => setSelectedPlayer(e.target.value)}
-                className="border rounded p-2 w-full sm:w-auto"
+                className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-grey focus:border-orange focus:ring-orange"
               >
-                <option value="">Select Player</option>
+                <option value="" className="text-white bg-grey">Select Player</option>
                 {players.map((player) => (
-                  <option key={player} value={player}>
+                  <option key={player} value={player} className="text-white bg-grey">
                     {player}
                   </option>
                 ))}
@@ -60,8 +60,8 @@ const RatingForm = ({ addRating, selectedPlayer, setSelectedPlayer, players, isP
                 <button
                   onClick={copyUrl}
                   className={`${
-                    copied ? 'bg-green-500' : 'bg-blue-500'
-                  } text-white px-4 py-2 rounded hover:bg-opacity-80 transition-colors`}
+                    copied ? 'bg-orange' : 'bg-orange'
+                  } text-white px-4 py-2 rounded hover:bg-orange/80 transition-colors`}
                 >
                   {copied ? 'Copied!' : 'Copy URL'}
                 </button>
@@ -70,25 +70,25 @@ const RatingForm = ({ addRating, selectedPlayer, setSelectedPlayer, players, isP
           )}
         </div>
         <div className="flex items-center space-x-4">
-          <label className="font-medium">Date:</label>
+          <label className="font-medium text-light-grey">Date:</label>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="border rounded p-2 w-full sm:w-auto"
+            className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-grey focus:border-orange focus:ring-orange"
           />
         </div>
       </div>
       <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mt-4">
         <div className="flex items-center space-x-4">
-          <label className="font-medium">Rating (1-5):</label>
+          <label className="font-medium text-light-grey">Rating (1-5):</label>
           <select
             value={rating}
             onChange={(e) => setRating(e.target.value)}
-            className="border rounded p-2 w-full sm:w-auto"
+            className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-grey focus:border-orange focus:ring-orange"
           >
             {[1, 2, 3, 4, 5].map((num) => (
-              <option key={num} value={num}>
+              <option key={num} value={num} className="text-white bg-grey">
                 {num}
               </option>
             ))}
@@ -96,7 +96,7 @@ const RatingForm = ({ addRating, selectedPlayer, setSelectedPlayer, players, isP
         </div>
         <button
           onClick={handleSubmit}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
+          className="bg-orange text-white px-4 py-2 rounded hover:bg-orange/80 w-full sm:w-auto"
         >
           Submit
         </button>
