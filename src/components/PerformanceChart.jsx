@@ -70,25 +70,30 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
+    const typeColors = {
+      'Tournament Game': '#2196F3', // Blue
+      'Friendly Game': '#4CAF50',   // Green
+      'Practice': '#F28C38'         // Orange
+    };
+
     const chart = new Chart(ctx, {
-      type: 'line',
+      type: 'bar',
       data: {
         labels: data.map((entry) => entry.date),
         datasets: [
           {
             label: `Practice Rating (${selectedPlayer || 'No Player'})`,
             data: data.map((entry) => entry.rating),
-            borderColor: '#F28C38',
-            backgroundColor: 'rgba(242, 140, 56, 0.2)',
-            fill: true,
-            tension: 0.4,
+            backgroundColor: data.map((entry) => typeColors[entry.type] || '#FFFFFF'),
+            borderColor: data.map((entry) => typeColors[entry.type] || '#FFFFFF'),
+            borderWidth: 1,
           },
         ],
       },
       options: {
         scales: {
           y: {
-            min: 1,
+            min: 0,
             max: 5,
             ticks: { stepSize: 1, color: '#FFFFFF' },
             title: { display: true, text: 'Rating', color: '#FFFFFF' },
@@ -157,6 +162,20 @@ const PerformanceChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, 
       {data.length > 0 ? (
         <>
           <canvas id="performanceChart"></canvas>
+          <div className="mt-4 flex flex-wrap gap-4">
+            <div className="flex items-center">
+              <span className="inline-block w-4 h-4 bg-blue-500 mr-2"></span>
+              <p className="text-white">Tournament Game</p>
+            </div>
+            <div className="flex items-center">
+              <span className="inline-block w-4 h-4 bg-green-500 mr-2"></span>
+              <p className="text-white">Friendly Game</p>
+            </div>
+            <div className="flex items-center">
+              <span className="inline-block w-4 h-4 bg-orange mr-2"></span>
+              <p className="text-white">Practice</p>
+            </div>
+          </div>
           <div className="mt-4">
             <p className="text-white font-medium">
               <strong>Score:</strong> {score}

@@ -3,6 +3,7 @@ import { useState } from 'react';
 const RatingForm = ({ addRating, selectedPlayer, setSelectedPlayer, players, isPlayerFromUrl }) => {
   const [rating, setRating] = useState(1);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [type, setType] = useState('Practice');
   const [copied, setCopied] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -16,9 +17,14 @@ const RatingForm = ({ addRating, selectedPlayer, setSelectedPlayer, players, isP
       alert('Please select a date.');
       return;
     }
-    addRating({ player: selectedPlayer, date, rating: parseInt(rating) });
+    if (!type) {
+      alert('Please select a type.');
+      return;
+    }
+    addRating({ player: selectedPlayer, date, rating: parseInt(rating), type });
     setRating(1);
     setDate(new Date().toISOString().split('T')[0]);
+    setType('Practice');
     setSuccess(true);
     setTimeout(() => setSuccess(false), 2000);
   };
@@ -83,6 +89,18 @@ const RatingForm = ({ addRating, selectedPlayer, setSelectedPlayer, players, isP
         </div>
       </div>
       <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mt-4">
+        <div className="flex items-center space-x-4">
+          <label className="font-medium text-light-grey">Type:</label>
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-container-grey focus:border-orange focus:ring-orange"
+          >
+            <option value="Tournament Game" className="text-white bg-container-grey">Tournament Game</option>
+            <option value="Friendly Game" className="text-white bg-container-grey">Friendly Game</option>
+            <option value="Practice" className="text-white bg-container-grey">Practice</option>
+          </select>
+        </div>
         <div className="flex items-center space-x-4">
           <label className="font-medium text-light-grey">Rating (1-5):</label>
           <select
