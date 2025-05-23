@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, doc, setDoc, getDoc, onSnapshot, query, where, getDocs } from 'firebase/firestore';
+import { collection, doc, setDoc, getDoc, onSnapshot, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import RatingForm from './components/RatingForm';
 import PerformanceChart from './components/PerformanceChart';
@@ -87,6 +87,15 @@ const App = () => {
       await setDoc(doc(db, 'tournamentResults', existingDoc.id), newResult);
     } else {
       await setDoc(doc(collection(db, 'tournamentResults')), newResult);
+    }
+  };
+
+  const deleteTournamentResult = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'tournamentResults', id));
+    } catch (error) {
+      console.error('Error deleting tournament result:', error);
+      alert('Failed to delete tournament. Check console for details.');
     }
   };
 
@@ -185,6 +194,7 @@ const App = () => {
               maxDate={maxDate}
               setMinDate={setMinDate}
               setMaxDate={setMaxDate}
+              deleteTournamentResult={deleteTournamentResult}
             />
             {!isPlayerFromUrl && <AddPlayerForm addPlayer={addPlayer} />}
           </>

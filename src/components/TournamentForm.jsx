@@ -1,13 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const TournamentForm = ({ addTournamentResult, selectedPlayer, setSelectedPlayer, players, isPlayerFromUrl }) => {
   const [tournamentName, setTournamentName] = useState('');
   const [result, setResult] = useState('Group Stage');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [isFutureDate, setIsFutureDate] = useState(false);
   const [copied, setCopied] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const today = new Date('2025-05-23T18:32:00+01:00'); // May 23, 2025, 06:32 PM WEST
+    const selectedDate = new Date(date);
+    setIsFutureDate(selectedDate > today);
+    if (selectedDate > today) {
+      setResult(undefined); // Reset for future dates (will be omitted in submission)
+    } else {
+      setResult('Group Stage'); // Default for past/present dates
+    }
+  }, [date]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedPlayer) {
       alert('Please select a player.');
@@ -17,20 +29,29 @@ const TournamentForm = ({ addTournamentResult, selectedPlayer, setSelectedPlayer
       alert('Please enter a tournament name.');
       return;
     }
-    if (!result) {
-      alert('Please select a result.');
-      return;
-    }
     if (!date) {
       alert('Please select a date.');
       return;
     }
-    addTournamentResult({ player: selectedPlayer, tournamentName, result, date });
-    setTournamentName('');
-    setResult('Group Stage');
-    setDate(new Date().toISOString().split('T')[0]);
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 2000);
+    if (!isFutureDate && !result) {
+      alert('Please select a result.');
+      return;
+    }
+    try {
+      const tournamentData = { player: selectedPlayer, tournamentName, date };
+      if (!isFutureDate) {
+        tournamentData.result = result;
+      }
+      await addTournamentResult(tournamentData);
+      setTournamentName('');
+      setResult(isFutureDate ? undefined : 'Group Stage');
+      setDate(new Date().toISOString().split('T')[0]);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
+    } catch (error) {
+      console.error('Error submitting tournament result:', error);
+      alert('Failed to submit tournament result. Check console for details.');
+    }
   };
 
   const copyUrl = async () => {
@@ -49,7 +70,7 @@ const TournamentForm = ({ addTournamentResult, selectedPlayer, setSelectedPlayer
 
   return (
     <div className="bg-container-grey p-6 rounded-lg shadow-md mb-6">
-      <h2 className="text-xl font-semibold text-orange mb-4">Log Tournament Result</h2>
+      <h2 className="text-xl font-semibold text-orange mb-4">Log Tournament</h2>
       <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
         <div className="flex items-center space-x-4">
           <label className="font-medium text-light-grey">Player:</label>
@@ -103,20 +124,22 @@ const TournamentForm = ({ addTournamentResult, selectedPlayer, setSelectedPlayer
             placeholder="Enter tournament name"
           />
         </div>
-        <div className="flex items-center space-x-4">
-          <label className="font-medium text-light-grey">Result:</label>
-          <select
-            value={result}
-            onChange={(e) => setResult(e.target.value)}
-            className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-container-grey focus:border-orange focus:ring-orange"
-          >
-            {['Group Stage', 'Best of 32', 'Best of 16', 'Quarterfinals', 'Semifinals', 'Finalist', 'Winner'].map((res) => (
-              <option key={res} value={res} className="text-white bg-container-grey">
-                {res}
-              </option>
-            ))}
-          </select>
-        </div>
+        {!isFutureDate && (
+          <div className="flex items-center space-x-4">
+            <label className="font-medium text-light-grey">Result:</label>
+            <select
+              value={result || 'Group Stage'}
+              onChange={(e) => setResult(e.target.value)}
+              className="border border-light-grey rounded p-2 w-full sm:w-auto text-white bg-container-grey focus:border-orange focus:ring-orange"
+            >
+              {['Group Stage', 'Best of 32', 'Best of 16', 'Quarterfinals', 'Semifinals', 'Finalist', 'Winner'].map((res) => (
+                <option key={res} value={res} className="text-white bg-container-grey">
+                  {res}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <button
           onClick={handleSubmit}
           className="bg-orange text-white px-4 py-2 rounded hover:bg-orange/80 w-full sm:w-auto"

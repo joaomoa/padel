@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import Chart from 'chart.js/auto';
 
-const TournamentChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, setMaxDate }) => {
+const TournamentChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, setMaxDate, deleteTournamentResult }) => {
   const resultValues = {
     'Group Stage': 1,
     'Best of 32': 2,
@@ -12,7 +12,15 @@ const TournamentChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, s
     'Winner': 7,
   };
 
-  const dates = data.map((entry) => entry.date);
+  // Filter data for chart (only entries with a defined result)
+  const chartData = data.filter((entry) => entry.result && typeof entry.result === 'string');
+
+  // Filter data for future tournaments (result is undefined or null)
+  const futureTournaments = data
+    .filter((entry) => !entry.result || entry.result === null)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const dates = chartData.map((entry) => entry.date);
   const defaultMinDate = dates.length > 0 ? Math.min(...dates.map((d) => new Date(d))) : '';
   const defaultMaxDate = dates.length > 0 ? Math.max(...dates.map((d) => new Date(d))) : '';
 
@@ -66,7 +74,7 @@ const TournamentChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, s
   };
 
   useEffect(() => {
-    if (data.length === 0) return;
+    if (chartData.length === 0) return;
 
     const canvas = document.getElementById('tournamentChart');
     if (!canvas) return;
@@ -75,13 +83,13 @@ const TournamentChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, s
     const chart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: data.map((entry) => entry.date),
+        labels: chartData.map((entry) => entry.date),
         datasets: [
           {
             label: `Tournament Results (${selectedPlayer || 'No Player'})`,
-            data: data.map((entry) => resultValues[entry.result]),
-            backgroundColor: data.map(() => '#2196F3'), // Blue, consistent with Tournament Game color
-            borderColor: data.map(() => '#2196F3'),
+            data: chartData.map((entry) => resultValues[entry.result]),
+            backgroundColor: chartData.map(() => '#2196F3'),
+            borderColor: chartData.map(() => '#2196F3'),
             borderWidth: 1,
           },
         ],
@@ -114,15 +122,15 @@ const TournamentChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, s
           },
           tooltip: {
             enabled: true,
-            backgroundColor: '#333333', // Dark grey background
-            titleColor: '#FFFFFF', // White text
-            bodyColor: '#FFFFFF', // White text
-            borderColor: '#2196F3', // Blue border
+            backgroundColor: '#333333',
+            titleColor: '#FFFFFF',
+            bodyColor: '#FFFFFF',
+            borderColor: '#2196F3',
             borderWidth: 1,
             callbacks: {
               label: (context) => {
                 const index = context.dataIndex;
-                const entry = data[index];
+                const entry = chartData[index];
                 return `${entry.date}: ${entry.tournamentName} - ${entry.result}`;
               },
             },
@@ -132,7 +140,7 @@ const TournamentChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, s
     });
 
     return () => chart.destroy();
-  }, [data, selectedPlayer]);
+  }, [chartData, selectedPlayer]);
 
   return (
     <div className="bg-container-grey p-6 rounded-lg shadow-md mb-12">
@@ -177,10 +185,42 @@ const TournamentChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, s
           This Year
         </button>
       </div>
-      {data.length > 0 ? (
+      {chartData.length > 0 ? (
         <canvas id="tournamentChart"></canvas>
       ) : (
         <p className="text-light-grey">No tournament results available for {selectedPlayer || 'selected player'}.</p>
+      )}
+      {futureTournaments.length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold text-orange mb-2">Upcoming Tournaments</h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full border-collapse border border-light-grey">
+              <thead>
+                <tr>
+                  <th className="border border-light-grey px-4 py-2 text-left text-white">Date</th>
+                  <th className="border border-light-grey px-4 py-2 text-left text-white">Tournament Name</th>
+                  <th className="border border-light-grey px-4 py-2 text-left text-white">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {futureTournaments.map((tournament, index) => (
+                  <tr key={index} className="even:bg-grey">
+                    <td className="border border-light-grey px-4 py-2 text-white">{tournament.date}</td>
+                    <td className="border border-light-grey px-4 py-2 text-white">{tournament.tournamentName}</td>
+                    <td className="border border-light-grey px-4 py-2 text-white">
+                      <button
+                        onClick={() => deleteTournamentResult(tournament.id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
     </div>
   );
