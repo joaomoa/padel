@@ -112,6 +112,21 @@ const TournamentChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, s
           legend: {
             labels: { color: '#FFFFFF' },
           },
+          tooltip: {
+            enabled: true,
+            backgroundColor: '#333333', // Dark grey background
+            titleColor: '#FFFFFF', // White text
+            bodyColor: '#FFFFFF', // White text
+            borderColor: '#2196F3', // Blue border
+            borderWidth: 1,
+            callbacks: {
+              label: (context) => {
+                const index = context.dataIndex;
+                const entry = data[index];
+                return `${entry.date}: ${entry.tournamentName} - ${entry.result}`;
+              },
+            },
+          },
         },
       },
     });
