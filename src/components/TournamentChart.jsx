@@ -20,38 +20,66 @@ const TournamentChart = ({ data, selectedPlayer, minDate, maxDate, setMinDate, s
     .filter((entry) => !entry.result || entry.result === null)
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  const dates = chartData.map((entry) => entry.date);
+  const dates = data.map((entry) => entry.date); // Include all tournaments (past and future)
   const defaultMinDate = dates.length > 0 ? Math.min(...dates.map((d) => new Date(d))) : '';
   const defaultMaxDate = dates.length > 0 ? Math.max(...dates.map((d) => new Date(d))) : '';
 
   const getThisWeekRange = () => {
-    const today = new Date();
+    const today = new Date('2025-05-24T13:40:00+01:00'); // May 24, 2025, 01:40 PM WEST
     const dayOfWeek = today.getDay();
     const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - daysToMonday);
     startOfWeek.setHours(0, 0, 0, 0);
+
+    // End of the week (Sunday)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    // If there are future tournaments, extend max to the latest tournament date
+    const latestTournamentDate = defaultMaxDate ? new Date(defaultMaxDate) : null;
+    const max = latestTournamentDate && latestTournamentDate > endOfWeek ? latestTournamentDate : endOfWeek;
+
     return {
       min: startOfWeek.toISOString().split('T')[0],
-      max: today.toISOString().split('T')[0],
+      max: max.toISOString().split('T')[0],
     };
   };
 
   const getThisMonthRange = () => {
-    const today = new Date();
+    const today = new Date('2025-05-24T13:40:00+01:00'); // May 24, 2025, 01:40 PM WEST
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    // End of the month
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    endOfMonth.setHours(23, 59, 59, 999);
+
+    // If there are future tournaments, extend max to the latest tournament date
+    const latestTournamentDate = defaultMaxDate ? new Date(defaultMaxDate) : null;
+    const max = latestTournamentDate && latestTournamentDate > endOfMonth ? latestTournamentDate : endOfMonth;
+
     return {
       min: startOfMonth.toISOString().split('T')[0],
-      max: today.toISOString().split('T')[0],
+      max: max.toISOString().split('T')[0],
     };
   };
 
   const getThisYearRange = () => {
-    const today = new Date();
+    const today = new Date('2025-05-24T13:40:00+01:00'); // May 24, 2025, 01:40 PM WEST
     const startOfYear = new Date(today.getFullYear(), 0, 1);
+
+    // End of the year
+    const endOfYear = new Date(today.getFullYear(), 11, 31);
+    endOfYear.setHours(23, 59, 59, 999);
+
+    // If there are future tournaments, extend max to the latest tournament date
+    const latestTournamentDate = defaultMaxDate ? new Date(defaultMaxDate) : null;
+    const max = latestTournamentDate && latestTournamentDate > endOfYear ? latestTournamentDate : endOfYear;
+
     return {
       min: startOfYear.toISOString().split('T')[0],
-      max: today.toISOString().split('T')[0],
+      max: max.toISOString().split('T')[0],
     };
   };
 
