@@ -9,10 +9,10 @@ const TournamentForm = ({ addTournamentResult, selectedPlayer, setSelectedPlayer
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    const today = new Date('2025-05-23T18:32:00+01:00'); // May 23, 2025, 06:32 PM WEST
-    const selectedDate = new Date(date);
-    setIsFutureDate(selectedDate > today);
-    if (selectedDate > today) {
+    const today = new Date().toISOString().split('T')[0]; // Dynamic current date (e.g., 2025-06-10)
+    const selectedDate = date;
+    setIsFutureDate(new Date(selectedDate) > new Date(today));
+    if (new Date(selectedDate) > new Date(today)) {
       setResult(undefined); // Reset for future dates (will be omitted in submission)
     } else {
       setResult('Group Stage'); // Default for past/present dates
